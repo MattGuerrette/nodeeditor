@@ -18,7 +18,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 
-option(BUILD_EXAMPLES "Build Examples" ON)
+option(BUILD_EXAMPLES "Build Examples" OFF)
 
 
 # Find the QtWidgets library
