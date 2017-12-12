@@ -40,7 +40,7 @@ NodeGraphicsObject(FlowScene& scene, const NodeIndex& index)
 
   setCacheMode( QGraphicsItem::DeviceCoordinateCache );
 
-  auto const &nodeStyle = StyleCollection::nodeStyle();
+  auto const &nodeStyle = index.model()->nodeStyle(index);
 
   {
     auto effect = new QGraphicsDropShadowEffect;
@@ -61,14 +61,14 @@ NodeGraphicsObject(FlowScene& scene, const NodeIndex& index)
 
   // connect to the move signals
   auto onMoveSlot = [this] {
-    
+
     // ask the model to move it
     if (!flowScene().model()->moveNode(_nodeIndex, pos())) {
       // set the location back
       setPos(_nodeIndex.model()->nodeLocation(_nodeIndex));
       moveConnections();
     }
-    
+
   };
   connect(this, &QGraphicsObject::xChanged, this, onMoveSlot);
   connect(this, &QGraphicsObject::yChanged, this, onMoveSlot);
@@ -273,7 +273,7 @@ mousePressEvent(QGraphicsSceneMouseEvent * event)
     [&](PortType portToCheck)
     {
       auto& model = *_nodeIndex.model();
-      
+
       // TODO do not pass sceneTransform
       int portIndex = _geometry.checkHitScenePoint(portToCheck,
                                                       event->scenePos(),
@@ -289,7 +289,7 @@ mousePressEvent(QGraphicsSceneMouseEvent * event)
         if (!connections.empty() && model.nodePortConnectionPolicy(_nodeIndex, portToCheck, portIndex) == ConnectionPolicy::One)
         {
           auto con = connections[0];
-          
+
           // cache the nodes and port indicies because the connection will be deleted
           auto lNode = con->node(PortType::Out);
           auto rNode = con->node(PortType::In);
@@ -301,7 +301,7 @@ mousePressEvent(QGraphicsSceneMouseEvent * event)
           if (!interaction.disconnect(portToCheck)) {
             return;
           }
-          
+
           // initialize a new connection
           if (portToCheck == PortType::In) {
             Q_ASSERT(_scene._temporaryConn == nullptr);
@@ -312,7 +312,7 @@ mousePressEvent(QGraphicsSceneMouseEvent * event)
             _scene._temporaryConn = new ConnectionGraphicsObject(NodeIndex{}, -1, rNode, rPortIdx, _scene);
             _scene._temporaryConn->geometry().setEndPoint(PortType::Out, event->scenePos());
           }
-          
+
           _scene._temporaryConn->grabMouse();
         }
         else // initialize new Connection
@@ -326,7 +326,7 @@ mousePressEvent(QGraphicsSceneMouseEvent * event)
             _scene._temporaryConn = new ConnectionGraphicsObject(_nodeIndex, portIndex, NodeIndex{}, -1, _scene);
             _scene._temporaryConn->geometry().setEndPoint(PortType::In, event->scenePos());
           }
-          
+
           _scene._temporaryConn->grabMouse();
         }
       }
@@ -336,7 +336,7 @@ mousePressEvent(QGraphicsSceneMouseEvent * event)
   clickPort(PortType::Out);
 
   auto pos     = event->pos();
-  
+
   if (index().model()->nodeResizable(index()) &&
     _geometry.resizeRect().contains(QPoint(pos.x(), pos.y())))
   {
@@ -475,5 +475,5 @@ contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
   flowScene().model()->nodeContextMenu(index(), event->screenPos());
 }
- 
+
 } // namespace QtNodes

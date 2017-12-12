@@ -25,7 +25,7 @@ class NODE_EDITOR_PUBLIC FlowScene
   : public QGraphicsScene
 {
   Q_OBJECT
-  
+
   friend NodeGraphicsObject;
   friend ConnectionGraphicsObject;
 public:
@@ -40,7 +40,7 @@ public:
 
   NodeGraphicsObject* nodeGraphicsObject(NodeIndex const& index) const { return nodeGraphicsObject(index.id()); }
   NodeGraphicsObject* nodeGraphicsObject(QUuid const& id) const;
-  
+
   std::vector<NodeIndex> selectedNodes() const;
 
 private slots:
@@ -56,7 +56,7 @@ private slots:
 private:
 
   FlowSceneModel* _model;
-  
+
   std::unordered_map<QUuid, NodeGraphicsObject*> _nodeGraphicsObjects;
   std::unordered_map<ConnectionID, ConnectionGraphicsObject*> _connGraphicsObjects;
 

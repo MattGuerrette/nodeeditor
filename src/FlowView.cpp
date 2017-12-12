@@ -27,11 +27,13 @@ using QtNodes::FlowView;
 using QtNodes::FlowScene;
 
 FlowView::
-FlowView(FlowScene *scene)
-  : QGraphicsView(scene)
-  , _scene(scene)
-  , _clickPos(QPointF())
+FlowView(QWidget *parent)
+  : QGraphicsView(parent)
+  , _clearSelectionAction(Q_NULLPTR)
+  , _deleteSelectionAction(Q_NULLPTR)
+  , _scene(Q_NULLPTR)
 {
+
   setDragMode(QGraphicsView::ScrollHandDrag);
   setRenderHint(QPainter::Antialiasing);
 
@@ -49,17 +51,13 @@ FlowView(FlowScene *scene)
   setCacheMode(QGraphicsView::CacheBackground);
 
   //setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+}
 
-  // setup actions
-  _clearSelectionAction = new QAction(QStringLiteral("Clear Selection"), this);
-  _clearSelectionAction->setShortcut(Qt::Key_Escape);
-  connect(_clearSelectionAction, &QAction::triggered, _scene, &QGraphicsScene::clearSelection);
-  addAction(_clearSelectionAction);
-
-  _deleteSelectionAction = new QAction(QStringLiteral("Delete Selection"), this);
-  _deleteSelectionAction->setShortcut(Qt::Key_Delete);
-  connect(_deleteSelectionAction, &QAction::triggered, this, &FlowView::deleteSelectedNodes);
-  addAction(_deleteSelectionAction);
+FlowView::
+FlowView(FlowScene *scene, QWidget* parent)
+  : FlowView(parent)
+{
+  setScene(scene);
 }
 
 
@@ -76,6 +74,27 @@ FlowView::
 deleteSelectionAction() const
 {
   return _deleteSelectionAction;
+}
+
+
+void
+FlowView::setScene(FlowScene *scene)
+{
+  _scene = scene;
+  QGraphicsView::setScene(_scene);
+
+  // setup actions
+  delete _clearSelectionAction;
+  _clearSelectionAction = new QAction(QStringLiteral("Clear Selection"), this);
+  _clearSelectionAction->setShortcut(Qt::Key_Escape);
+  connect(_clearSelectionAction, &QAction::triggered, _scene, &QGraphicsScene::clearSelection);
+  addAction(_clearSelectionAction);
+
+  delete _deleteSelectionAction;
+  _deleteSelectionAction = new QAction(QStringLiteral("Delete Selection"), this);
+  _deleteSelectionAction->setShortcut(Qt::Key_Delete);
+  connect(_deleteSelectionAction, &QAction::triggered, this, &FlowView::deleteSelectedNodes);
+  addAction(_deleteSelectionAction);
 }
 
 
@@ -118,25 +137,25 @@ contextMenuEvent(QContextMenuEvent *event)
   {
     // get the category
     auto category = _scene->model()->nodeTypeCategory(modelName);
-    
+
     // see if it's already in the map
     auto iter = categoryItems.find(category);
-    
+
     // add it if it doesn't exist
     if (iter == categoryItems.end()) {
-        
+
         auto item = new QTreeWidgetItem(treeView);
         item->setText(0, category);
         item->setData(0, Qt::UserRole, skipText);
-        
-        iter = categoryItems.emplace(category, item).first; 
+
+        iter = categoryItems.emplace(category, item).first;
     }
-    
+
     // this is the category item
     auto parent = iter->second;
-    
+
     // add the item
-    
+
 
     auto item   = new QTreeWidgetItem(parent);
     item->setText(0, modelName);
@@ -162,7 +181,7 @@ contextMenuEvent(QContextMenuEvent *event)
 
     // try to create the node
     auto uuid = _scene->model()->addNode(modelName, posView);
-    
+
     // if the node creation failed, then don't add it
     if (!uuid.isNull()) {
         // move it to the cursor location
@@ -253,10 +272,10 @@ deleteSelectedNodes()
 {
   // delete the nodes, this will delete many of the connections
   for (QGraphicsItem * item : _scene->selectedItems())
-  { 
+  {
     if (auto n = qgraphicsitem_cast<NodeGraphicsObject*>(item)) {
       auto index = n->index();
-      
+
       flowScene().model()->removeNodeWithConnections(index);
     }
   }
@@ -265,10 +284,10 @@ deleteSelectedNodes()
   for (QGraphicsItem * item : _scene->selectedItems())
   {
     if (auto c = qgraphicsitem_cast<ConnectionGraphicsObject*>(item)) {
-      
+
       // does't matter if it works or doesn't, at least we tried
       flowScene().model()->removeConnection(c->node(PortType::Out), c->portIndex(PortType::Out), c->node(PortType::In), c->portIndex(PortType::In));
-      
+
     }
   }
 }
