@@ -268,13 +268,12 @@ mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     _scene._temporaryConn = nullptr;
     delete this;
   }
-  else if (state().requiresPort())
-  {
-    Q_ASSERT(this == _scene._temporaryConn);
 
-    _scene._temporaryConn = nullptr;
-    delete this;
-  }
+  Q_ASSERT(this == _scene._temporaryConn);
+
+  _scene._temporaryConn = nullptr;
+  delete this;
+
 }
 
 
