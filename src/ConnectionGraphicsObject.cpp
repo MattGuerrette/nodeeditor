@@ -263,10 +263,6 @@ mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
   if (node && interaction.tryConnect())
   {
     node->resetReactionToConnection();
-    Q_ASSERT(this == _scene._temporaryConn);
-
-    _scene._temporaryConn = nullptr;
-    delete this;
   }
 
   Q_ASSERT(this == _scene._temporaryConn);
