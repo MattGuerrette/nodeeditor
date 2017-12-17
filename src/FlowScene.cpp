@@ -44,13 +44,6 @@ FlowScene::FlowScene(FlowSceneModel* model)
       }
     }
   }
-  
-  // for some reason these end up in the wrong spot, fix that
-  for (const auto& n : model->nodeUUids()) {
-    auto ngo = nodeGraphicsObject(n);
-    ngo->geometry().recalculateSize();
-    ngo->moveConnections();
-  }
 }
 
 FlowScene::~FlowScene() = default;
@@ -124,6 +117,9 @@ nodeAdded(const QUuid& newID)
 
   auto ngo = new NodeGraphicsObject(*this, index);
   Q_ASSERT(ngo->scene() == this);
+
+  // ensure correct initial sizing (before first paint)
+  ngo->geometry().recalculateSize();
 
   _nodeGraphicsObjects[index.id()] = ngo;
 
