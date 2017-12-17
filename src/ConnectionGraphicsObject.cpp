@@ -39,7 +39,7 @@ ConnectionGraphicsObject(const NodeIndex& leftNode, PortIndex leftPortIndex, con
   setAcceptHoverEvents(true);
 
   // addGraphicsEffect();
-  
+
   // initialize the end points
   if (leftNode.isValid()) {
     auto ngo = _scene.nodeGraphicsObject(leftNode);
@@ -47,7 +47,7 @@ ConnectionGraphicsObject(const NodeIndex& leftNode, PortIndex leftPortIndex, con
 
     _geometry.moveEndPoint(PortType::Out,  ngo->geometry().portScenePosition(leftPortIndex, PortType::Out, ngo->sceneTransform()));
   }
-  
+
   if (rightNode.isValid()) {
     auto ngo = _scene.nodeGraphicsObject(rightNode);
     Q_ASSERT(ngo != nullptr);
@@ -103,28 +103,28 @@ ConnectionID
 ConnectionGraphicsObject::
 id() const {
   ConnectionID ret;
-  
+
   ret.lNodeID = _leftNode.id();
   ret.rNodeID = _rightNode.id();
   ret.lPortID = _leftPortIndex;
   ret.rPortID = _rightPortIndex;
-  
+
   return ret;
 }
 
 NodeDataType
-ConnectionGraphicsObject::dataType() const 
+ConnectionGraphicsObject::dataType() const
 {
   // get a valid node
   auto validType = node(PortType::In).isValid() ? PortType::In : PortType::Out;
   auto validNode = node(validType);
   Q_ASSERT(validNode.isValid());
-  
+
   auto dataType = _scene.model()->nodePortDataType(validNode, validType, portIndex(validType));
-  
+
   // make sure it matches the other side
   Q_ASSERT(!node(oppositePort(validType)).isValid() || dataType.id == node(oppositePort(validType)).model()->nodePortDataType(node(oppositePort(validType)), oppositePort(validType), portIndex(oppositePort(validType))).id);
-  
+
   return dataType;
 }
 
@@ -137,13 +137,13 @@ move()
   [this] (PortType portType)
   {
     auto nodeIndex = node(portType);
-    
+
     auto const &nodeGraphics = *_scene.nodeGraphicsObject(nodeIndex);
 
     auto const &nodeGeom = nodeGraphics.geometry();
 
     QPointF scenePos =
-      nodeGeom.portScenePosition(portIndex(portType), 
+      nodeGeom.portScenePosition(portIndex(portType),
                                   portType,
                                   nodeGraphics.sceneTransform());
 
@@ -157,7 +157,7 @@ move()
 
       setGeometryChanged();
       update();
-    
+
     }
   };
 
@@ -241,19 +241,19 @@ mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
   auto node = locateNodeAt(event->scenePos(), _scene,
                            _scene.views()[0]->transform());
-  
+
   if (!node) {
-    
+
     if (state().requiresPort()) {
       Q_ASSERT(this == _scene._temporaryConn);
       // remove this from the scene
-      delete _scene._temporaryConn;
       _scene._temporaryConn = nullptr;
+      delete this;
     }
-    
+
     return;
   }
-  
+
   if (!state().requiresPort()) {
     return;
   }
@@ -265,15 +265,15 @@ mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     node->resetReactionToConnection();
     Q_ASSERT(this == _scene._temporaryConn);
 
-    delete _scene._temporaryConn;
     _scene._temporaryConn = nullptr;
+    delete this;
   }
   else if (state().requiresPort())
   {
     Q_ASSERT(this == _scene._temporaryConn);
 
-    delete _scene._temporaryConn;
     _scene._temporaryConn = nullptr;
+    delete this;
   }
 }
 
@@ -285,9 +285,9 @@ hoverEnterEvent(QGraphicsSceneHoverEvent* event)
   geometry().setHovered(true);
 
   update();
-  
+
   flowScene().model()->connectionHovered(_leftNode, _leftPortIndex, _rightNode, _rightPortIndex, event->screenPos(), true);
-  
+
   event->accept();
 }
 
