@@ -55,6 +55,9 @@ public:
   virtual std::unique_ptr<NodeDataModel>
   clone() const = 0;
 
+  virtual void
+  onDoubleClicked() = 0;
+
 public:
 
   QJsonObject

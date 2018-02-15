@@ -298,6 +298,8 @@ bool DataFlowModel::moveNode(NodeIndex const& index, QPointF newLocation) {
 
 void DataFlowModel::nodeDoubleClicked(NodeIndex const& index, QPoint const& pos) {
   emit nodeDoubleClickedSignal(*_nodes[index.id()]);
+
+  _nodes[index.id()]->nodeDataModel()->onDoubleClicked();
 }
 
 void DataFlowModel::connectionHovered(NodeIndex const& lhs, PortIndex lPortIndex, NodeIndex const& rhs, PortIndex rPortIndex, QPoint const& pos, bool entered) {
