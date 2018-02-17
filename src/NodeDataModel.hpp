@@ -56,7 +56,7 @@ public:
   clone() const = 0;
 
   virtual void
-  onDoubleClicked() = 0;
+  onDoubleClicked() { };
 
 public:
 

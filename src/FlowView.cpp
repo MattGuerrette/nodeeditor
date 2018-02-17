@@ -193,22 +193,29 @@ contextMenuEvent(QContextMenuEvent *event)
   //Setup filtering
   connect(txtBox, &QLineEdit::textChanged, [&](const QString &text)
   {
-    for (auto& topLvlItem : categoryItems)
-    {
-      for (int i = 0; i < topLvlItem.second->childCount(); ++i)
+      for (auto& topLvlItem : categoryItems)
       {
-        auto child = topLvlItem.second->child(i);
-        auto modelName = child->data(0, Qt::UserRole).toString();
-        if (modelName.contains(text, Qt::CaseInsensitive))
-        {
-          child->setHidden(false);
-        }
-        else
-        {
-          child->setHidden(true);
-        }
+          int hidden = 0;
+          for (int i = 0; i < topLvlItem.second->childCount(); ++i)
+          {
+              auto child = topLvlItem.second->child(i);
+              auto modelName = child->data(0, Qt::UserRole).toString();
+              if (modelName.contains(text, Qt::CaseInsensitive))
+              {
+                  child->setHidden(false);
+              }
+              else
+              {
+                  child->setHidden(true);
+                  hidden++;
+              }
+          }
+
+          if (hidden == topLvlItem.second->childCount())
+              topLvlItem.second->setHidden(true);
+          else
+              topLvlItem.second->setHidden(false);
       }
-    }
   });
 
   // make sure the text box gets focus so the user doesn't have to click on it
