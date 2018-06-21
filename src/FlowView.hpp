@@ -29,6 +29,9 @@ public:
 
   void setScene(FlowScene *scene);
 
+  int mouseX() const;
+  int mouseY() const;
+
 public slots:
 
   void scaleUp();
@@ -67,5 +70,7 @@ private:
   QPointF _clickPos;
 
   FlowScene* _scene;
+  int _mouseX;
+  int _mouseY;
 };
 }

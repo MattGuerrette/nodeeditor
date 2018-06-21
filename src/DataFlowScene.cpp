@@ -377,6 +377,41 @@ saveToMemory() const
   return document.toJson();
 }
 
+QByteArray
+DataFlowScene::
+saveToMemory(int layer) const
+{
+  QJsonObject sceneJson;
+
+  QJsonArray nodesJsonArray;
+
+  for (auto const & pair : _dataFlowModel->_nodes)
+  {
+    auto const &node = pair.second;
+    if(node->layer() == layer)
+      nodesJsonArray.append(node->save());
+  }
+
+  sceneJson["nodes"] = nodesJsonArray;
+
+  QJsonArray connectionJsonArray;
+  for (auto const & pair : _dataFlowModel->_connections)
+  {
+    auto const &connection = pair.second;
+
+    QJsonObject connectionJson = connection->save();
+
+    if (!connectionJson.isEmpty())
+      connectionJsonArray.append(connectionJson);
+  }
+
+  sceneJson["connections"] = connectionJsonArray;
+
+  QJsonDocument document(sceneJson);
+
+  return document.toJson();
+}
+
 
 void
 DataFlowScene::

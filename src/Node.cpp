@@ -64,6 +64,25 @@ restore(QJsonObject const& json)
   _nodeDataModel->restore(json["model"].toObject());
 }
 
+int Node::layer() const
+{
+  return layer_;
+}
+
+void Node::setLayer(int l)
+{
+  layer_ = l;
+}
+
+PHYS_Rect& Node::rect()
+{
+    return rect_;
+}
+
+void Node::setRect(PHYS_Rect rect)
+{
+    rect_ = rect;
+}
 
 QUuid
 Node::
@@ -94,11 +113,25 @@ nodeDataModel() const
   return _nodeDataModel.get();
 }
 
+void Node::setAnchorInit(bool v)
+{
+  anchorInit = v;
+}
+
+bool Node::anchorInitialized()
+{
+  return anchorInit;
+}
+
 
 std::vector<Connection*>&
 Node::
 connections(PortType pType, PortIndex idx)
 {
+  std::vector<Connection*> connections;
+  if(_inConnections.size() <= 0 && _outConnections.size() <= 0)
+    return connections;
+
   Q_ASSERT(pType == PortType::In ? idx < _inConnections.size() : idx < _outConnections.size());
   
   return pType == PortType::In ? _inConnections[idx] : _outConnections[idx];

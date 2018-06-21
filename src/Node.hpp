@@ -16,6 +16,8 @@
 #include "NodeGraphicsObject.hpp"
 #include "ConnectionGraphicsObject.hpp"
 #include "Serializable.hpp"
+#include "phys.h"
+
 
 namespace QtNodes
 {
@@ -52,12 +54,22 @@ public:
   QUuid
   id() const;
 
+  int layer() const;
+
   
 public:
   
   QPointF position() const;
   void setPosition(QPointF const& newPos);
-  
+
+  void setLayer(int l);
+
+  PHYS_Rect& rect();
+  void setRect(PHYS_Rect rect);
+
+  bool anchorInitialized();
+  void setAnchorInit(bool v);
+
 public:
 
   NodeDataModel*
@@ -91,6 +103,9 @@ private:
   // data
   std::unique_ptr<NodeDataModel> _nodeDataModel;
   QUuid _index;
+  int layer_;
+  PHYS_Rect rect_;
+  bool anchorInit;
 
 };
 }

@@ -102,7 +102,7 @@ void
 FlowView::
 contextMenuEvent(QContextMenuEvent *event)
 {
-  if (itemAt(event->pos()))
+  if (itemAt(event->pos()) && !qgraphicsitem_cast<QGraphicsPixmapItem*>(itemAt(event->pos())))
   {
     QGraphicsView::contextMenuEvent(event);
     return;
@@ -342,6 +342,8 @@ mousePressEvent(QMouseEvent *event)
   if (event->button() == Qt::LeftButton) {
       _clickPos = mapToScene(event->pos());
   }
+  _mouseX = event->pos().x();
+  _mouseY = event->pos().y();
 }
 
 void
@@ -358,7 +360,21 @@ mouseMoveEvent(QMouseEvent *event)
           setSceneRect(sceneRect().translated(difference.x(), difference.y()));
       }
   }
+
+  _mouseX = event->pos().x();
+  _mouseY = event->pos().y();
 }
+
+int FlowView::mouseX() const
+{
+  return _mouseX;
+}
+
+int FlowView::mouseY() const
+{
+  return _mouseY;
+}
+
 
 void
 FlowView::
@@ -403,12 +419,12 @@ drawBackground(QPainter* painter, const QRectF& r)
   QPen pfine(flowViewStyle.FineGridColor, 1.0);
 
   painter->setPen(pfine);
-  drawGrid(15);
+  drawGrid(50);
 
   QPen p(flowViewStyle.CoarseGridColor, 1.0);
 
   painter->setPen(p);
-  drawGrid(150);
+  drawGrid(500);
 }
 
 

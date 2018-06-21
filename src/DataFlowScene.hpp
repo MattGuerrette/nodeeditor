@@ -75,6 +75,8 @@ public:
 
   QByteArray saveToMemory() const;
 
+  QByteArray saveToMemory(int index) const;
+
   void loadFromMemory(const QByteArray& data);
 
 signals:

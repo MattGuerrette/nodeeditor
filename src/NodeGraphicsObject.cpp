@@ -18,6 +18,7 @@
 
 #include "NodeIndex.hpp"
 #include "FlowSceneModel.hpp"
+#include "Node.hpp"
 
 namespace QtNodes {
 
@@ -65,9 +66,11 @@ NodeGraphicsObject(FlowScene& scene, const NodeIndex& index)
     // ask the model to move it
     if (!flowScene().model()->moveNode(_nodeIndex, pos())) {
       // set the location back
-      setPos(_nodeIndex.model()->nodeLocation(_nodeIndex));
+      //setPos(_nodeIndex.model()->nodeLocation(_nodeIndex));
       moveConnections();
     }
+
+
 
   };
   connect(this, &QGraphicsObject::xChanged, this, onMoveSlot);
@@ -348,6 +351,9 @@ void
 NodeGraphicsObject::
 mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
+  Node* node = (Node*)this->_nodeIndex.internalPointer();
+  if(node)
+    node->rect().m_Static = true;
 
   if (_state.resizing())
   {
@@ -355,6 +361,9 @@ mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 
     if (auto w = _nodeIndex.model()->nodeWidget(_nodeIndex))
     {
+
+
+
       prepareGeometryChange();
 
       auto oldSize = w->size();
@@ -398,6 +407,12 @@ NodeGraphicsObject::
 mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
   _state.setResizing(false);
+
+  Node* node = (Node*)this->_nodeIndex.internalPointer();
+  if(node) {
+    node->rect().m_Static = false;
+    node->setAnchorInit(false);
+  }
 
   QGraphicsObject::mouseReleaseEvent(event);
 
