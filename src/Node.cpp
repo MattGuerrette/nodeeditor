@@ -17,7 +17,7 @@ namespace QtNodes {
 Node::
 Node(std::unique_ptr<NodeDataModel> && dataModel, QUuid const& id)
   : _nodeDataModel(std::move(dataModel))
-  , _index(id)
+  , _index(id), anchorInit(false)
 {
   // propagate data: model => node
   connect(_nodeDataModel.get(), &NodeDataModel::dataUpdated,
